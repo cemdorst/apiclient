@@ -1,4 +1,4 @@
-package client
+package apiclient
 
 import (
 	"fmt"
@@ -33,7 +33,7 @@ func NewClient(host, token *string) (*Client, error) {
 	return &c, nil
 }
 
-func (c *Client) doRequest(req *http.Request) ([]byte, error) {
+func (c *Client) DoRequest(req *http.Request) ([]byte, error) {
 	req.Header.Set("Authorization", c.Token)
 
 	res, err := c.HTTPClient.Do(req)
