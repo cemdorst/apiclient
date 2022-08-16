@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"time"
+	"errors"
 )
 
 // Client -
@@ -24,7 +25,7 @@ func (c *Client) New(token, apiAddress string) {
 }
 
 //Do Generic Request
-func (c *Client) DoRequest(method, url string) (result []byte) {
+func (c *Client) DoRequest(method, url string) (result []byte, error) {
 
 	var idns map[string]interface{}
 
@@ -53,5 +54,5 @@ func (c *Client) DoRequest(method, url string) (result []byte) {
 		return nil, err
 	}
 
-	return
+	return result, nil
 }
