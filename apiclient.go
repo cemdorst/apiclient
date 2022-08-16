@@ -2,11 +2,11 @@ package apiclient
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
-	"errors"
 )
 
 // Client -
@@ -25,9 +25,10 @@ func (c *Client) New(token, apiAddress string) {
 }
 
 //Do Generic Request
-func (c *Client) DoRequest(method, url string) (result []byte, error) {
+func (c *Client) DoRequest(method, url string) ([]byte, error) {
 
 	var idns map[string]interface{}
+	var result []byte
 
 	req, err := http.NewRequest(method, c.ConfigHostURL+url, nil)
 	if err != nil {
@@ -43,10 +44,10 @@ func (c *Client) DoRequest(method, url string) (result []byte, error) {
 	}
 	switch code := resp.StatusCode; {
 	case code != 200:
-		err := fmt.Errorf("%d",resp.StatusCode)
+		err := fmt.Errorf("%d", resp.StatusCode)
 		return nil, err
 	}
-		
+
 	defer resp.Body.Close()
 	result, _ = ioutil.ReadAll(resp.Body)
 
