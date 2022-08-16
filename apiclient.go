@@ -1,55 +1,58 @@
 package apiclient
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
+	"errors"
 )
-
-// HostURL - Default API URL
-const HostURL string = "https://api.azionapi.net:443"
 
 // Client -
 type Client struct {
-	HostURL    string
-	HTTPClient *http.Client
-	Token      string
+	ConfigHostURL string
+	ConfigToken   string
+	HTTPClient    *http.Client
 }
 
 // NewClient -
-func NewClient(host, token *string) (*Client, error) {
-	c := Client{
-		HTTPClient: &http.Client{Timeout: 10 * time.Second},
-		// Default API URL
-		HostURL: HostURL,
-		Token:   *token,
-	}
+func (c *Client) New(token, apiAddress string) {
 
-	if host != nil {
-		c.HostURL = *host
-	}
-
-	return &c, nil
+	c.HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	c.ConfigHostURL = apiAddress
+	c.ConfigToken = "Token " + token
 }
 
-func (c *Client) DoRequest(req *http.Request) ([]byte, error) {
-	req.Header.Set("Authorization", c.Token)
+//Do Generic Request
+func (c *Client) DoRequest(method, url string) (result []byte, error) {
 
-	res, err := c.HTTPClient.Do(req)
+	var idns map[string]interface{}
+
+	req, err := http.NewRequest(method, c.ConfigHostURL+url, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+	req.Header.Set("Authorization", c.ConfigToken)
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Accept", "application/json; version=3")
 
-	body, err := ioutil.ReadAll(res.Body)
+	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	switch code := resp.StatusCode; {
+	case code != 200:
+		err := fmt.Errorf("%d",resp.StatusCode)
+		return nil, err
+	}
+		
+	defer resp.Body.Close()
+	result, _ = ioutil.ReadAll(resp.Body)
 
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("status: %d, body: %s", res.StatusCode, body)
+	if err := json.Unmarshal(result, &idns); err != nil {
+		return nil, err
 	}
 
-	return body, err
+	return result, nil
 }
