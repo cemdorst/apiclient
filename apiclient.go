@@ -30,7 +30,7 @@ func (c *Client) DoRequest(method, url string) (result []byte) {
 
 	req, err := http.NewRequest(method, c.ConfigHostURL+url, nil)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	req.Header.Set("Authorization", c.ConfigToken)
 	req.Header.Add("Content-Type", "application/json")
@@ -38,17 +38,19 @@ func (c *Client) DoRequest(method, url string) (result []byte) {
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
+	switch code := resp.StatusCode; {
+	case code != 200:
+		err := fmt.Errorf("%d",resp.StatusCode)
+		return nil, err
+	}
+		
 	defer resp.Body.Close()
 	result, _ = ioutil.ReadAll(resp.Body)
 
 	if err := json.Unmarshal(result, &idns); err != nil {
-		fmt.Println(err)
-	}
-
-	for k, j := range idns {
-		fmt.Printf("%s, type: %T, %s, type: %T \n", k, k, j, j)
+		return nil, err
 	}
 
 	return
