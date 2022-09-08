@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type Client struct {
 	ConfigHostURL string
 	ConfigToken   string
 	HTTPClient    *http.Client
+	Payload       string
 }
 
 // NewClient -
@@ -23,13 +25,15 @@ func (c *Client) New(token, apiAddress string) {
 	c.ConfigToken = "Token " + token
 }
 
-//Do Generic Request
+// Do Generic Request
 func (c *Client) DoRequest(method, url string) ([]byte, error) {
 
 	var idns map[string]interface{}
 	var result []byte
 
-	req, err := http.NewRequest(method, c.ConfigHostURL+url, nil)
+	payload := strings.NewReader(c.Payload)
+
+	req, err := http.NewRequest(method, c.ConfigHostURL+url, payload)
 	if err != nil {
 		return nil, err
 	}
