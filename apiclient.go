@@ -46,7 +46,7 @@ func (c *Client) DoRequest(method, url string) ([]byte, error) {
 		return nil, err
 	}
 	switch code := resp.StatusCode; {
-	case code != 200:
+	case code < 200 || code > 299:
 		err := fmt.Errorf("%d", resp.StatusCode)
 		return nil, err
 	}
