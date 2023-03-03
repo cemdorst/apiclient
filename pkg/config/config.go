@@ -21,16 +21,16 @@ type AzionApiConfig interface {
 }
 
 func (ac *ApiConfig) SetAuthorizationHeader(token string) bool {
-	ac.domain.AddDefaultHeader("Authorization", "token "+token)
-	ac.idns.AddDefaultHeader("Authorization", "token "+token)
+	ac.Domain.AddDefaultHeader("Authorization", "token "+token)
+	ac.Idns.AddDefaultHeader("Authorization", "token "+token)
 	return true
 }
 
 func (ac *ApiConfig) SetAcceptHeader(content string) bool {
 	switch content_type := content; {
 	case content_type == "json":
-		ac.domain.AddDefaultHeader("Accept", "application/json;version=3")
-		ac.idns.AddDefaultHeader("Accept", "application/json;version=3")
+		ac.Domain.AddDefaultHeader("Accept", "application/json;version=3")
+		ac.Idns.AddDefaultHeader("Accept", "application/json;version=3")
 	}
 
 	return true
