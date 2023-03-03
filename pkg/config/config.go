@@ -6,13 +6,13 @@ import (
 )
 
 type Client struct {
-	domain *domains.APIClient
-	idns   *idns.APIClient
+	Domain *domains.APIClient
+	Idns   *idns.APIClient
 }
 
 type ApiConfig struct {
-	domain *domains.Configuration
-	idns   *idns.Configuration
+	Domain *domains.Configuration
+	Idns   *idns.Configuration
 }
 
 type AzionApiConfig interface {
