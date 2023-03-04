@@ -1,6 +1,9 @@
 package config
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/aziontech/azionapi-go-sdk/domains"
 	"github.com/aziontech/azionapi-go-sdk/idns"
 )
@@ -18,6 +21,7 @@ type ApiConfig struct {
 type AzionApiConfig interface {
 	SetAuthorizationHeader(string) bool
 	SetAcceptHeader(string) bool
+	SetHttpClient() bool
 }
 
 func (ac *ApiConfig) SetAuthorizationHeader(token string) bool {
@@ -32,6 +36,13 @@ func (ac *ApiConfig) SetAcceptHeader(content string) bool {
 		ac.Domain.AddDefaultHeader("Accept", "application/json;version=3")
 		ac.Idns.AddDefaultHeader("Accept", "application/json;version=3")
 	}
+
+	return true
+}
+
+func (ac *ApiConfig) SetHttpClient() bool {
+	ac.Domain.HTTPClient = &http.Client{Timeout: 10 * time.Second}
+	ac.Idns.HTTPClient = &http.Client{Timeout: 10 * time.Second}
 
 	return true
 }
